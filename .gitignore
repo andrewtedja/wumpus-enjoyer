@@ -1,0 +1,4 @@
+.venv
+.venv_pandas
+.venv_matplotlib
+venv/
