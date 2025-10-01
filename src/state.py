@@ -10,29 +10,22 @@ from typing import Dict
 '''
 
 # ========================== Read Input (JSON) ==========================
-with open("data/sample_input.json", "r") as input_file:
-    data = json.load(input_file)
+# with open("data/sample_input.json", "r") as input_file:
+#     data = json.load(input_file)
 
 
-# ========================== State Representation ==========================
+# # ========================== State Representation ==========================
 
-hari_list = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"]
-jam_list = list(range(7, 16))
-ruangan = [ruang["kode"] for ruang in data["ruangan"]]
+# hari_list = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"]
+# jam_list = list(range(7, 16))
+# ruangan = [ruang["kode"] for ruang in data["ruangan"]]
 
-kelas_mata_kuliah = data["kelas_mata_kuliah"]
+# kelas_mata_kuliah = data["kelas_mata_kuliah"]
 
-
-# ========================== Slot Definition ==========================
-slot = []
-for hari in hari_list:
-    for jam in jam_list:
-        for ruang in ruangan:
-            slot.append((hari, jam, ruang))
 
 
 # ========================== INIT STATE ==========================
-def init_state(kelas_mata_kuliah, ruangan) -> Dict:
+def init_state(kelas_mata_kuliah, ruangan, hari_list, jam_list) -> Dict:
     state = {}
 
     for matkul in kelas_mata_kuliah:
@@ -51,10 +44,10 @@ def init_state(kelas_mata_kuliah, ruangan) -> Dict:
 
 
 # ! TESTING
-if __name__ == "__main__":
-    state = init_state(kelas_mata_kuliah, ruangan)
-    print(state)
+# if __name__ == "__main__":
+#     state = init_state(kelas_mata_kuliah, ruangan)
+#     print(state)
     
 
-    df = pd.DataFrame(list(state.items()), columns=["key", "value"])
-    print(df)
+#     df = pd.DataFrame(list(state.items()), columns=["key", "value"])
+#     print(df)
