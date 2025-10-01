@@ -36,17 +36,6 @@ def get_bentrok_mahasiswa(state, data) -> int:
     return score
 
 
-def get_bentrok_ruangan(state) -> int:
-    score = 0
-    slot_counter = defaultdict(list)
-    for (hari, jam, ruang), kode in state.items():
-        slot_counter[(hari, jam, ruang)].append(kode)
-    for slot, kelas in slot_counter.items():
-        if len(kelas) > 1:
-            score += len(kelas)
-
-    return score
-
 def get_overcapacity(state, data) -> int:
     score = 0
 
@@ -60,14 +49,13 @@ def get_overcapacity(state, data) -> int:
                 if kelas["jumlah_mahasiswa"] > kapasitas:
 
                     # print(f"[DEBUG OVERCAP] ", kelas["jumlah_mahasiswa"], ">", kapasitas)
-                    score += (kelas["jumlah_mahasiswa"] - kapasitas) * kelas["sks"]
+                    score += (kelas["jumlah_mahasiswa"] - kapasitas) * 0.5 * kelas["sks"]
 
     return score
 
 # ===================== TOTAL SCORE =====================
 def evaluate(state, data) -> int:
     print("[DEBUG] bentrok mahasiswa:", get_bentrok_mahasiswa(state, data))
-    print("[DEBUG] bentrok ruangan:", get_bentrok_ruangan(state))
     print("[DEBUG] overcap:", get_overcapacity(state, data))
 
-    return (get_bentrok_mahasiswa(state, data) + get_bentrok_ruangan(state) + get_overcapacity(state, data))
+    return (get_bentrok_mahasiswa(state, data) + get_overcapacity(state, data))

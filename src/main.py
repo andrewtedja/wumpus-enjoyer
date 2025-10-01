@@ -1,5 +1,5 @@
 import json
-from state import init_state
+from state import init_state, generate_slots, get_empty_slots
 from objective import evaluate
 import pandas as pd
 
@@ -9,23 +9,23 @@ if __name__ == "__main__":
     with open("data/sample_input.json", "r") as input_file:
         data = json.load(input_file)
 
-
-    # ========================== State Representation ==========================
-
     kelas_mata_kuliah = data["kelas_mata_kuliah"]
     ruangan = [ruang["kode"] for ruang in data["ruangan"]]
-    hari_list = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"]
-    jam_list = list(range(7, 16))
 
-    state = init_state(kelas_mata_kuliah, ruangan, hari_list, jam_list)
+    slots = generate_slots(ruangan)
+    state = init_state(kelas_mata_kuliah, slots)
+
 
     print("[STATE REP] STATE AWAL:")
     df = pd.DataFrame(list(state.items()), columns=["key", "value"])
     print(df)
 
-    score = evaluate(state, data)
+    print("\nEMPTY SLOTS:")
+    empty_slots = get_empty_slots(state, slots)
+    df_empty = pd.DataFrame(empty_slots, columns=["Hari", "Jam", "Ruangan"])
+    print(df_empty.head(20))
 
-    
+    score = evaluate(state, data)
 
     print("\n[OBJ FUNCTION] EVALUATED SCORE: ")
     print("Score total:", score)
