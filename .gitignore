@@ -2,3 +2,6 @@
 .venv_pandas
 .venv_matplotlib
 venv/
+
+*test*
+__pycache__/

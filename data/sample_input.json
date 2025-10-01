@@ -1,0 +1,41 @@
+{
+	"kelas_mata_kuliah": [
+		{ "kode": "IF3110", "jumlah_mahasiswa": 60, "sks": 2 },
+		{ "kode": "IF3170", "jumlah_mahasiswa": 55, "sks": 2 },
+		{ "kode": "IF3130", "jumlah_mahasiswa": 50, "sks": 2 },
+		{ "kode": "IF3140", "jumlah_mahasiswa": 65, "sks": 2 },
+		{ "kode": "IF2224", "jumlah_mahasiswa": 70, "sks": 2 },
+		{ "kode": "WI2022", "jumlah_mahasiswa": 40, "sks": 2 },
+		{ "kode": "II2100", "jumlah_mahasiswa": 45, "sks": 2 }
+	],
+
+	"ruangan": [
+		{ "kode": "7609", "kuota": 60 },
+		{ "kode": "7606", "kuota": 80 },
+		{ "kode": "Multipurpose", "kuota": 100 },
+		{ "kode": "K3.203", "kuota": 50 }
+	],
+
+	"mahasiswa": [
+		{
+			"nim": "13523001",
+			"daftar_mk": ["IF3110", "IF3170", "IF3130"],
+			"prioritas": [1, 2, 3]
+		},
+		{
+			"nim": "13523002",
+			"daftar_mk": ["IF3140", "WI2022", "II2100"],
+			"prioritas": [1, 2, 3]
+		},
+		{
+			"nim": "13523003",
+			"daftar_mk": ["IF2224", "IF3130", "IF3110"],
+			"prioritas": [1, 2, 3]
+		},
+		{
+			"nim": "13523004",
+			"daftar_mk": ["IF3170", "IF2224"],
+			"prioritas": [1, 2]
+		}
+	]
+}
