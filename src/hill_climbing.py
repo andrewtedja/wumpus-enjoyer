@@ -41,7 +41,7 @@ def getNeighbors(state, slots, kelas_mata_kuliah, visited):
 
     return neighbors
 
-def hill_climbing_sideways(state, data, slots, max_iter=1000, max_side=500):
+def hill_climbing_sideways(state, data, slots, max_iter=1000, max_side=20):
     current = state
     current_score = evaluate(current, data)
     side_count = 0
@@ -57,8 +57,13 @@ def hill_climbing_sideways(state, data, slots, max_iter=1000, max_side=500):
         scored_neighbors.sort(key=lambda x: x[0])
 
         best_score, best_neighbor = scored_neighbors[0]
+        print(f"Step {step+1}: Nilai fungsi objektif = {current_score}, Sideways Move = {side_count}")
 
-        if best_score < current_score:
+        if best_score <= 0:
+            print("Solusi optimal ditemukan")
+            current, current_score = best_neighbor, best_score
+            break
+        elif best_score < current_score:
             current, current_score = best_neighbor, best_score
             side_count = 0
         elif best_score == current_score and side_count < max_side:
@@ -66,7 +71,6 @@ def hill_climbing_sideways(state, data, slots, max_iter=1000, max_side=500):
             side_count += 1
         else:
             break
-        print(f"Step {step+1}: Nilai fungsi objektif = {current_score}, Sideway Move = {side_count}")
 
-        return current, current_score
+    return current, current_score
 
