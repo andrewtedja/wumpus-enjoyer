@@ -27,30 +27,29 @@ def init_state(kelas_mata_kuliah, slots) -> Dict:
     state = {}
     used_slots = set()
 
-    for matkul in kelas_mata_kuliah:
+    for matkul in sorted(kelas_mata_kuliah, key = lambda x : -x["sks"]):
         kode = matkul["kode"]
         sks = matkul["sks"]
 
+        attempt = 0
         valid = False
-        while not valid:
+        while not valid and attempt < 1000:
             hari, jam_mulai, ruang = random.choice(slots)
-            
-            batas_awal = jam_mulai + sks - 1
-            if batas_awal > 15:
+            attempt += 1
+
+            if jam_mulai + sks - 1 > max(jam_list):
+                continue
+            candidate_slots = [(hari, jam, ruang) for jam in range(jam_mulai, jam_mulai + sks)]
+            if any(slot in used_slots for slot in candidate_slots):
                 continue
 
-            candidate_slots = [(hari, jam_mulai + offset, ruang) for offset in range(sks)]
-
+            for slot in candidate_slots:
+                state[slot] = kode
+                used_slots.add(slot)
             valid = True
-            for cs in candidate_slots:
-                if cs in used_slots:
-                    valid = False
-                    break
+        if not valid:
+            raise ValueError(f"Tidak dapat meng-assign {kode} dengan {sks} sks setelah {attempt} percobaan.")
 
-            if valid:
-                for cs in candidate_slots:
-                    state[cs] = kode
-                    used_slots.add(cs)
             
     return state
 

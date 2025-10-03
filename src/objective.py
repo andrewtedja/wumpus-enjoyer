@@ -55,7 +55,7 @@ def get_overcapacity(state, data) -> int:
 
 # ===================== TOTAL SCORE =====================
 def evaluate(state, data) -> int:
-    print("[DEBUG] bentrok mahasiswa:", get_bentrok_mahasiswa(state, data))
-    print("[DEBUG] overcap:", get_overcapacity(state, data))
+    # print("[DEBUG] bentrok mahasiswa:", get_bentrok_mahasiswa(state, data))
+    # print("[DEBUG] overcap:", get_overcapacity(state, data))
 
     return (get_bentrok_mahasiswa(state, data) + get_overcapacity(state, data))
