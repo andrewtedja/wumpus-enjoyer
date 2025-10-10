@@ -10,7 +10,7 @@ from typing import Dict, List
 
 # ========================== State Representation ==========================
 hari_list = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"]
-jam_list = list(range(7, 16))
+jam_list = list(range(7, 18))
 
 # ========================== Slot Definition ==========================
 def generate_slots(ruangan):
@@ -27,41 +27,25 @@ def init_state(kelas_mata_kuliah, slots) -> Dict:
     state = {}
     used_slots = set()
 
-    for matkul in sorted(kelas_mata_kuliah, key = lambda x : -x["sks"]):
+    for matkul in kelas_mata_kuliah:
         kode = matkul["kode"]
         sks = matkul["sks"]
 
-        attempt = 0
-        valid = False
-        while not valid and attempt < 1000:
+        count = 0
+
+        while count < sks:
             hari, jam_mulai, ruang = random.choice(slots)
-            attempt += 1
 
-            if jam_mulai + sks - 1 > max(jam_list):
-                continue
-            candidate_slots = [(hari, jam, ruang) for jam in range(jam_mulai, jam_mulai + sks)]
-            if any(slot in used_slots for slot in candidate_slots):
+            if (hari, jam_mulai, ruang) in used_slots:
                 continue
 
-            for slot in candidate_slots:
-                state[slot] = kode
-                used_slots.add(slot)
-            valid = True
-        if not valid:
-            raise ValueError(f"Tidak dapat meng-assign {kode} dengan {sks} sks setelah {attempt} percobaan.")
+            state[(hari, jam_mulai, ruang)] = kode
+            used_slots.add((hari, jam_mulai, ruang))
+            count += 1
 
-            
     return state
 
 # HELPER
 def get_empty_slots(state, slots) -> List:
     return [slot for slot in slots if slot not in state.keys()]
 
-# ! TESTING
-# if __name__ == "__main__":
-#     state = init_state(kelas_mata_kuliah, ruangan)
-#     print(state)
-    
-
-#     df = pd.DataFrame(list(state.items()), columns=["key", "value"])
-#     print(df)

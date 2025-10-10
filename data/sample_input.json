@@ -2,11 +2,11 @@
 	"kelas_mata_kuliah": [
 		{ "kode": "IF3110", "jumlah_mahasiswa": 60, "sks": 2 },
 		{ "kode": "IF3170", "jumlah_mahasiswa": 55, "sks": 2 },
-		{ "kode": "IF3130", "jumlah_mahasiswa": 50, "sks": 2 },
-		{ "kode": "IF3140", "jumlah_mahasiswa": 65, "sks": 2 },
+		{ "kode": "IF3130", "jumlah_mahasiswa": 50, "sks": 3 },
+		{ "kode": "IF3140", "jumlah_mahasiswa": 65, "sks": 3 },
 		{ "kode": "IF2224", "jumlah_mahasiswa": 70, "sks": 2 },
 		{ "kode": "WI2022", "jumlah_mahasiswa": 40, "sks": 2 },
-		{ "kode": "II2100", "jumlah_mahasiswa": 45, "sks": 2 }
+		{ "kode": "II2100", "jumlah_mahasiswa": 45, "sks": 3 }
 	],
 
 	"ruangan": [
