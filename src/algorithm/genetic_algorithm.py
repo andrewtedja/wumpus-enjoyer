@@ -4,8 +4,8 @@ import copy
 import time
 from typing import List, Dict, Tuple, Any
 
-from state import init_state, get_empty_slots, generate_slots, hari_list, jam_list
-from objective import evaluate
+from utils.state import init_state, get_empty_slots, generate_slots, hari_list, jam_list
+from utils.objective import evaluate
 
 # ------------------ Helper utilities for state manipulation ------------------
 

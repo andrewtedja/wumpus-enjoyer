@@ -1,9 +1,9 @@
 import json
 import pandas as pd
-from state import init_state, generate_slots, get_empty_slots, hari_list, jam_list
-from objective import evaluate
-from genetic_algorithm import genetic_algorithm
-from hill_climbing import hill_climbing_sideways
+from utils.state import init_state, generate_slots, get_empty_slots, hari_list, jam_list
+from utils.objective import evaluate
+from algorithm.genetic_algorithm import genetic_algorithm
+from algorithm.hill_climbing import hill_climbing_sideways
 # from debug import genetic_algorithm_debug
 
 
@@ -30,7 +30,7 @@ def print_timetable(state, ruangan_list):
 
 # ========================== MAIN ==========================
 if __name__ == "__main__":
-    with open("sample_input.json", "r") as input_file:
+    with open("data/sample_input.json", "r") as input_file:
         data = json.load(input_file)
 
     kelas_mata_kuliah = data["kelas_mata_kuliah"]

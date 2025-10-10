@@ -1,6 +1,6 @@
 import copy
 import random
-from objective import evaluate
+from utils.objective import evaluate
 
 def getNeighbors(state, slots, kelas_mata_kuliah):
     import copy, random
