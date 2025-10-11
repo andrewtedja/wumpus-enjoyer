@@ -44,6 +44,49 @@ def getNeighbors(state, slots, kelas_mata_kuliah):
 
         return neighbor_state
 
+def hill_climbing_steepest(state, data, slots, max_iter=1000):
+    current = state
+    current_score = evaluate(current, data)
+    visited = {tuple(sorted(current.items()))}
+    
+    for step in range(max_iter):
+        neighbors = []
+        attempts = 0
+        seen_candidates = set()
+        while not neighbors and attempts < 100:
+            candidate = getNeighbors(current, slots, data["kelas_mata_kuliah"])
+            attempts += 1
+            if candidate is None:
+                continue
+            signature = tuple(sorted(candidate.items()))
+            if signature in visited or signature in seen_candidates:
+                continue
+            neighbors.append(candidate)
+            seen_candidates.add(signature)
+        if not neighbors:
+            print("[DEBUG] Tidak ada tetangga yang valid ditemukan, stop.")
+            break
+        
+        scored_neighbors = [(evaluate(neighbor, data), neighbor) for neighbor in neighbors]
+        scored_neighbors.sort(key=lambda x: x[0])
+
+        best_score, best_neighbor = scored_neighbors[0]
+        print(f"Step {step+1}: Nilai fungsi objektif awal = {current_score}")
+
+        if best_score <= 0:
+            print("[DONE] Solusi optimal ditemukan")
+            current, current_score = best_neighbor, best_score
+            break
+        elif best_score < current_score:
+            current, current_score = best_neighbor, best_score
+            side_count = 0
+        else:
+            print("[DONE] Tidak ada perbaikan lebih lanjut, berhenti.")
+            break
+        visited.add(tuple(sorted(current.items())))
+
+    return current, current_score
+
 
 def hill_climbing_sideways(state, data, slots, max_iter=1000, max_side=20):
     current = state
@@ -124,3 +167,47 @@ def hill_climbing_random_restart(state, data, slots, max_restarts=10, max_iter=1
 
     return best_state, best_score
 
+def hill_climbing_stochastic(state, data, slots, max_iter=1000, max_attempts=50):
+    current = state
+    current_score = evaluate(current, data)
+    visited = {tuple(sorted(current.items()))}  # simpan bentuk hash
+
+    print(f"[INIT] Score awal = {current_score}")
+
+    for step in range(max_iter):
+        neighbor = None
+        attempts = 0
+
+        # generate neighbor yang belum pernah diambil
+        while attempts < max_attempts:
+            attempts += 1
+            candidate = getNeighbors(current, slots, data["kelas_mata_kuliah"])
+            if candidate is None:
+                continue
+
+            key = tuple(sorted(candidate.items()))
+            if key not in visited:
+                neighbor = candidate
+                visited.add(key)
+                break
+
+        # kalau gak ada neighbor baru
+        if neighbor is None:
+            print(f"[STOP] Tidak ada neighbor baru setelah {max_attempts} percobaan.")
+            break
+
+        neighbor_score = evaluate(neighbor, data)
+        print(f"[STEP {step}] Score {current_score} → {neighbor_score}")
+
+        # kalo neighbor lebih bagus, pindah ke neighbor
+        if neighbor_score < current_score:
+            current, current_score = neighbor, neighbor_score
+        else:
+            pass
+
+        # stop duluan kalo udah optimal
+        if current_score <= 0:
+            print(f"[DONE] Solusi optimal ditemukan di iter {step}")
+            break
+
+    return current, current_score
