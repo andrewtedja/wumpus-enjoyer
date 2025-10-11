@@ -69,7 +69,7 @@ if __name__ == "__main__":
     print(df_best)
     print("Best Score:", best_score)
 
-    if n == 3:
+    if n == 5:
         print(f"\n[INFO] Total Iterasi SA: {len(history)}")
         print(f"[INFO] Skor Akhir (Best): {best_score:.3f}")
         print("[INFO] Plot E(T) telah ditampilkan.")
