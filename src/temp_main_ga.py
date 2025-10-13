@@ -4,12 +4,12 @@ from state import init_state, generate_slots, get_empty_slots, hari_list, jam_li
 from objective import evaluate
 from genetic_algorithm import genetic_algorithm
 from hill_climbing import hill_climbing_sideways
+from GA_plot import plot_history
 # from debug import genetic_algorithm_debug
 
 
-# ========================== PRINT TIME TABLE ==========================
 def print_timetable(state, ruangan_list):
-    print("\n==================== GENERATED TIMETABLE ====================")
+    print("\n==================== TIMETABLE ====================")
     for ruang in ruangan_list:
         print(f"\nRuangan: {ruang}")
         print("-" * 60)
@@ -28,7 +28,6 @@ def print_timetable(state, ruangan_list):
         print(df_table.fillna("").to_string())
         print("\n")
 
-# ========================== MAIN ==========================
 if __name__ == "__main__":
     with open("sample_input.json", "r") as input_file:
         data = json.load(input_file)
@@ -53,6 +52,7 @@ if __name__ == "__main__":
     print("Score total:", score)
 
     print("\n[START] Starting Genetic Algorithm...")
+    
     # best_state, best_score, history = genetic_algorithm_debug(
     #     data, slots, pop_size=3, max_iter=100
     # )
@@ -66,3 +66,5 @@ if __name__ == "__main__":
     print("Best Score:", best_score)
 
     print_timetable(best_state, ruangan)
+
+    plot_history(history, max_iter=100)
