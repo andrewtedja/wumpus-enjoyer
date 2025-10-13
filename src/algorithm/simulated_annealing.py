@@ -2,18 +2,18 @@ import math, random, copy
 from utils.objective import evaluate
 from .hill_climbing import getNeighbors
 import matplotlib.pyplot as plt
+import time
 
 '''
 NOTES SA:
-- Asumsi: ini SA nya mode GA (gradient ascent), bukan GD (gradient descent), jadi neighbor lebi tinggi dari current yang better (higher is better) or maximization
-- deltaE = val(current) - val(neighbor)
+- deltaE = val(neighbor) - val(current) (Minimization kaya GD)
 - Menerima solusi lebih buruk dengan probabilitas -> boltzmann(E(T)) e^(deltaE/T)
 - Save riwayat untuk plotting dan frekuensi stuck
 '''
 
 # ==================== Boltzmann Function ====================
 
-def schedule(t, T0=1000, alpha=0.95):
+def schedule(t, T0, alpha):
     return T0 * (alpha ** t)
 
 
@@ -27,7 +27,9 @@ def boltzmann(deltaE, T) -> float:
 
 
 # ==================== Simulated Annealing ====================
-def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95):
+def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, target_score = 0.0001, patience = 500):
+    start_time = time.time()
+
     current = copy.deepcopy(state)
     current_score = evaluate(current, data)
     best = copy.deepcopy(current)
@@ -35,65 +37,108 @@ def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95):
 
 
     # Save history (iter, score, E(T), T)
-    T = T0
-    history = []         
+    score_history = []         
+    boltzmann_history = []
     stuck_count = 0
     max_stuck = 0
+    no_improvement_count = 0
 
     t = 0
+    T = T0
 
-    while True:
-        T = schedule(t, T0, alpha)
-        if T < T_min or current_score == 0:
-            break
+    print(f"[SA] Initial Score: {current_score:.4f}")
 
+    while T > T_min and current_score >= target_score:
         neighbor = getNeighbors(current, slots, data["kelas_mata_kuliah"])
         neighbor_score = evaluate(neighbor, data)
-        delta = neighbor_score - current_score  
-
-        # Accept
-        accept = False
-        if delta < 0: 
-            accept = True
-        else:
-            p = math.exp(-delta / T)
-            if random.random() < p:
-                accept = True
         
+        delta = neighbor_score - current_score
+        
+        boltz_prob = boltzmann(delta, T) if delta > 0 else 1.0
+        print(boltz_prob)
+
+        accept = False
+        if delta < 0:  
+            accept = True
+        else:  
+            if random.random() < boltz_prob:
+                accept = True
+
         if accept:
-            current, current_score = neighbor, neighbor_score
+            current = neighbor
+            current_score = neighbor_score
 
-        # Track best
-        improved = False
-        if current_score < best_score: 
-            best, best_score = copy.deepcopy(current), current_score
-            improved = True
-
-
-        # Stuck Cnter
-        if improved:
+        # Track best solution
+        if current_score < best_score:
+            best = copy.deepcopy(current)
+            best_score = current_score
             stuck_count = 0
+            no_improvement_count = 0
         else:
             stuck_count += 1
+            no_improvement_count += 1
+        
         max_stuck = max(max_stuck, stuck_count)
 
-        # Logging History
-        boltz_score = boltzmann(delta, T)
+        # Save history
+        score_history.append(best_score)
+        boltzmann_history.append(boltz_prob)
 
+        if best_score < target_score:
+            print(f"[SA] Target score reached at iteration {t}")
+            break
+        
+        if no_improvement_count >= patience:
+            print(f"[SA] No improvement for {patience} iterations")
+            break
+
+      
+
+        # Update
         t += 1
-        history.append((t, current_score, boltz_score, T))
+        T = schedule(t, T0, alpha)
 
-        print(f"Iter {t+1}: T={T:.2f}, Score={current_score:.2f}, Best={best_score:.2f}")
+    duration = time.time() - start_time
 
-    print(f"[STUCK SA INFO] Max consecutive stuck iterations: {max_stuck}")
+    # Final report
+    print(f"[SA] Final Score: {best_score:.4f}")
+    print(f"[SA] Iterations: {t}")
+    print(f"[SA] Duration: {duration:.2f}s")
+    print(f"[SA] Max Stuck: {max_stuck}")
 
-    # Plotting booltzman vs iteration cnt
-    plt.plot([h[0] for h in history], [h[2] for h in history])
-    plt.title("E(T) terhadap Iterasi (Simulated Annealing)")
-    plt.xlabel("Iterasi")
-    plt.ylabel("e^(-ΔE/T)")
-    plt.grid(True)
-    plt.yscale("log")
+    # Plotting
+    plot_sa_results(score_history, boltzmann_history)
+
+    return best, best_score, {
+        'score_history': score_history,
+        'boltzmann_history': boltzmann_history,
+        'max_stuck': max_stuck,
+        'duration': duration,
+        'iterations': t,
+        'initial_score': score_history[0] if score_history else current_score
+    }
+
+
+# ==================== Plotting ====================
+
+def plot_sa_results(score_history, boltzmann_history):
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
+
+    iterations = list(range(len(score_history)))
+
+    # Plot 1: Objective function (best score) vs iterasi
+    ax1.plot(iterations, score_history, 'b-', linewidth=2)
+    ax1.set_xlabel('Iterasi')
+    ax1.set_ylabel('Objective Function (Best Score)')
+    ax1.set_title('Nilai Objective Function terhadap Iterasi')
+    ax1.grid(True, alpha=0.3)
+
+    # Plot 2: e^(-deltaE/T) vs iterasi (khusus SA)
+    ax2.plot(iterations, boltzmann_history, 'r-', linewidth=1)
+    ax2.set_xlabel('Iterasi')
+    ax2.set_ylabel('e^(-deltaE/T)')
+    ax2.set_title('Probabilitas Boltzmann terhadap Iterasi')
+    ax2.grid(True, alpha=0.3)
+
+    plt.tight_layout()
     plt.show()
-
-    return best, best_score, history

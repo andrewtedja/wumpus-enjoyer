@@ -57,7 +57,7 @@ if __name__ == "__main__":
         algo_name = "Stochastic Hill Climbing"
     elif n == 5:
         print("\nStarting Simulated Annealing (Gradient Ascent Mode)...")
-        best_state, best_score, history = simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95)
+        best_state, best_score, history = simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, target_score = 0.0001, patience = 500)
         algo_name = "Simulated Annealing"
     else:
         print("[ERROR] Pilihan tidak valid.")
