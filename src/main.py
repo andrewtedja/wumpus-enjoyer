@@ -3,6 +3,7 @@ from utils.state import init_state, generate_slots, get_empty_slots
 from utils.objective import evaluate
 from algorithm.hill_climbing import hill_climbing_steepest, hill_climbing_sideways, hill_climbing_random_restart, hill_climbing_stochastic
 from algorithm.simulated_annealing import simulated_annealing
+from utils.visualize_timetable import visualize_state
 
 import pandas as pd
 
@@ -17,6 +18,8 @@ if __name__ == "__main__":
 
     slots = generate_slots(ruangan)
     state = init_state(kelas_mata_kuliah, slots)
+
+    visualize_state(state, ruangan, save_path="src/data/jadwal-output.png", show=False)
 
     # ========================== PRINT TIME TABLE ==========================
     print("[STATE REP] STATE AWAL:")
