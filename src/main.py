@@ -9,7 +9,7 @@ import pandas as pd
 if __name__ == "__main__":
     
     # ========================== Read Input (JSON) ==========================
-    with open("data/sample_input.json", "r") as input_file:
+    with open("src/data/sample_input.json", "r") as input_file:
         data = json.load(input_file)
 
     kelas_mata_kuliah = data["kelas_mata_kuliah"]
@@ -57,7 +57,7 @@ if __name__ == "__main__":
         algo_name = "Stochastic Hill Climbing"
     elif n == 5:
         print("\nStarting Simulated Annealing (Gradient Ascent Mode)...")
-        best_state, best_score, history = simulated_annealing(state, data, slots, T_start=1000, T_min=1, alpha=0.95, max_iter=1000)
+        best_state, best_score, history = simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95)
         algo_name = "Simulated Annealing"
     else:
         print("[ERROR] Pilihan tidak valid.")
