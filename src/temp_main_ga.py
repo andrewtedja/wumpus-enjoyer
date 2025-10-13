@@ -53,11 +53,15 @@ if __name__ == "__main__":
 
     print("\n[START] Starting Genetic Algorithm...")
     
+    pop_size = int(input("Masukkan jumlah populasi: "))
+    max_iter = int(input("Masukkan jumlah iterasi: "))
+
     # best_state, best_score, history = genetic_algorithm_debug(
-    #     data, slots, pop_size=3, max_iter=100
+    #     data, slots, pop_size=pop_size, max_iter=max_iter
     # )
+
     best_state, best_score, history = genetic_algorithm(
-        data, slots, pop_size=3, max_iter=100, verbose=True
+        data, slots, pop_size=pop_size, max_iter=max_iter, verbose=True
     )
 
     print("\n[RESULT] BEST STATE AFTER GENETIC ALGORITHM:")
@@ -67,4 +71,4 @@ if __name__ == "__main__":
 
     print_timetable(best_state, ruangan)
 
-    plot_history(history, max_iter=100)
+    plot_history(history, max_iter=max_iter)
