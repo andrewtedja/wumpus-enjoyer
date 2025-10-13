@@ -18,13 +18,8 @@ def get_slots(state: Dict[Tuple[str,int,str], str], kode: str) -> List[Tuple[str
 def find_initial_position(slots_all: List[Tuple[str,int,str]],
                                state: Dict[Tuple[str,int,str], str],
                                sks: int) -> List[Tuple[str,int,str]]:
-    """
-    Return possible starting slots (hari, jam, ruang) from slots_all where you can place
-    a class of length sks consecutively in jam dimension without collision.
-    """
     used = set(state.keys())
     valid_starts = []
-    # Precompute max jam
     max_jam = max(jam_list)
     for hari, jam, ruang in slots_all:
         if jam + sks - 1 > max_jam:
@@ -76,14 +71,9 @@ def move_code(state, kode, new_hari, new_jam, new_ruang, sks):
         slot = (new_hari, new_jam + offset, new_ruang)
         state[slot] = kode
 
-# ------------------ GA Components ------------------
+# ------------------ Genetic Algorithm ------------------
 def fitness_function(score: float) -> float:
     return 1.0 / (1.0 + score)
-
-# def tournament_selection(population: List[Dict], scores: List[float], k: int = 3) -> Dict:
-#     idxs = random.sample(range(len(population)), k)
-#     best_idx = min(idxs, key=lambda i: scores[i])
-#     return copy.deepcopy(population[best_idx])
 
 def roulette_wheel_selection(population: List[Dict], scores: List[float]) -> Dict:
     fitnesses = [fitness_function(s) for s in scores]
