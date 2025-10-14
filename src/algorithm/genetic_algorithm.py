@@ -5,6 +5,7 @@ import time
 from typing import List, Dict, Tuple, Any
 from utils.state import init_state, get_empty_slots, generate_slots, hari_list, jam_list
 from utils.objective import evaluate
+from utils.GA_utils import *
 
 def fitness_function(score: float) -> float:
     return 1.0 / (1.0 + score)
