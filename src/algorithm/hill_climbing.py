@@ -48,6 +48,7 @@ def hill_climbing_steepest(state, data, slots, max_iter=1000):
     current = state
     current_score = evaluate(current, data)
     visited = {tuple(sorted(current.items()))}
+    scores = [current_score]
     
     for step in range(max_iter):
         neighbors = []
@@ -76,16 +77,18 @@ def hill_climbing_steepest(state, data, slots, max_iter=1000):
         if best_score <= 0:
             print("[DONE] Solusi optimal ditemukan")
             current, current_score = best_neighbor, best_score
+            scores.append(current_score)
             break
         elif best_score < current_score:
             current, current_score = best_neighbor, best_score
+            scores.append(current_score)
             side_count = 0
         else:
             print("[DONE] Tidak ada perbaikan lebih lanjut, berhenti.")
             break
         visited.add(tuple(sorted(current.items())))
 
-    return current, current_score
+    return current, current_score, scores
 
 
 def hill_climbing_sideways(state, data, slots, max_iter=1000, max_side=20):
@@ -93,6 +96,7 @@ def hill_climbing_sideways(state, data, slots, max_iter=1000, max_side=20):
     current_score = evaluate(current, data)
     side_count = 0
     visited = {tuple(sorted(current.items()))}
+    scores = [current_score]
     
     for step in range(max_iter):
         neighbors = []
@@ -121,12 +125,15 @@ def hill_climbing_sideways(state, data, slots, max_iter=1000, max_side=20):
         if best_score <= 0:
             print("[DONE] Solusi optimal ditemukan")
             current, current_score = best_neighbor, best_score
+            scores.append(current_score)
             break
         elif best_score < current_score:
             current, current_score = best_neighbor, best_score
+            scores.append(current_score)
             side_count = 0
         elif best_score == current_score and side_count < max_side:
             current, current_score = best_neighbor, best_score
+            scores.append(current_score)
             print("[SIDEWAYS] Melakukan sideways move")
             side_count += 1
         else:
@@ -134,11 +141,12 @@ def hill_climbing_sideways(state, data, slots, max_iter=1000, max_side=20):
             break
         visited.add(tuple(sorted(current.items())))
 
-    return current, current_score
+    return current, current_score, scores
 
 def hill_climbing_random_restart(state, data, slots, max_restarts=10, max_iter=1000):
     best_state = state
     best_score = evaluate(state, data)
+    best_scores = []
 
     for restart in range(max_restarts):
         print(f"Restart {restart+1}")
@@ -161,16 +169,18 @@ def hill_climbing_random_restart(state, data, slots, max_restarts=10, max_iter=1
                         break
 
 
-        new_state, new_score = hill_climbing_sideways(initial_state, data, slots, max_iter=max_iter)
+        new_state, new_score, scores = hill_climbing_steepest(initial_state, data, slots, max_iter=max_iter)
+        best_scores.append(new_score)
         if new_score < best_score:
             best_state, best_score = new_state, new_score
 
-    return best_state, best_score
+    return best_state, best_score, best_scores
 
 def hill_climbing_stochastic(state, data, slots, max_iter=1000, max_attempts=50):
     current = state
     current_score = evaluate(current, data)
     visited = {tuple(sorted(current.items()))}  # simpan bentuk hash
+    scores = [current_score]
 
     print(f"[INIT] Score awal = {current_score}")
 
@@ -197,6 +207,7 @@ def hill_climbing_stochastic(state, data, slots, max_iter=1000, max_attempts=50)
             break
 
         neighbor_score = evaluate(neighbor, data)
+        scores.append(neighbor_score)
         print(f"[STEP {step}] Score {current_score} → {neighbor_score}")
 
         # kalo neighbor lebih bagus, pindah ke neighbor
@@ -210,4 +221,4 @@ def hill_climbing_stochastic(state, data, slots, max_iter=1000, max_attempts=50)
             print(f"[DONE] Solusi optimal ditemukan di iter {step}")
             break
 
-    return current, current_score
+    return current, current_score, scores

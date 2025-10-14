@@ -1,4 +1,5 @@
 import json
+from utils.plotter import plot_scores, plot_scores_random_restart
 from utils.state import init_state, generate_slots, get_empty_slots
 from utils.objective import evaluate
 from algorithm.hill_climbing import hill_climbing_steepest, hill_climbing_sideways, hill_climbing_random_restart, hill_climbing_stochastic
@@ -44,19 +45,19 @@ if __name__ == "__main__":
     # ========================== EXECUTE ==========================
     if n == 1:
         print("\nStarting Hill Climbing...")
-        best_state, best_score = hill_climbing_steepest(state, data, slots, max_iter=1000)
+        best_state, best_score, scores = hill_climbing_steepest(state, data, slots, max_iter=1000)
         algo_name = "Hill Climbing"
     elif n == 2:
         print("\nStarting Hill Climbing with Sideways Move...")
-        best_state, best_score = hill_climbing_sideways(state, data, slots, max_iter=1000, max_side=500)
+        best_state, best_score, scores = hill_climbing_sideways(state, data, slots, max_iter=1000, max_side=500)
         algo_name = "Hill Climbing (Sideways Move)"
     elif n == 3:
         print("\nStarting Hill Climbing with Random Restart...")
-        best_state, best_score = hill_climbing_random_restart(state, data, slots, max_restarts=10, max_iter=1000)
+        best_state, best_score, scores = hill_climbing_random_restart(state, data, slots, max_restarts=10, max_iter=1000)
         algo_name = "Hill Climbing (Random Restart)"
     elif n == 4:
         print("\nStarting Stochastic Hill Climbing...")
-        best_state, best_score = hill_climbing_stochastic(state, data, slots, max_iter=1000, max_attempts=50)
+        best_state, best_score, scores = hill_climbing_stochastic(state, data, slots, max_iter=1000, max_attempts=50)
         algo_name = "Stochastic Hill Climbing"
     elif n == 5:
         print("\nStarting Simulated Annealing (Gradient Ascent Mode)...")
@@ -71,6 +72,18 @@ if __name__ == "__main__":
     df_best = pd.DataFrame(list(best_state.items()), columns=["key", "value"])
     print(df_best)
     print("Best Score:", best_score)
+
+    if (n == 1 or n == 2 or n == 4):
+        print(f"\n[INFO] Total Iterasi: {len(scores)}")
+        print(f"[INFO] Skor Akhir (Best): {best_score:.3f}")
+        print("[INFO] Plot skor telah ditampilkan.")
+        plot_scores(scores, f"{algo_name} - Nilai Fungsi Objektif per Iterasi")
+
+    if n == 3:
+        print(f"\n[INFO] Total Restart: {len(scores)}")
+        print(f"[INFO] Skor Akhir (Best): {best_score:.3f}")
+        print("[INFO] Plot skor telah ditampilkan.")
+        plot_scores_random_restart(scores)
 
     if n == 5:
         print(f"\n[INFO] Total Iterasi SA: {len(history)}")
