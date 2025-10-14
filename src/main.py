@@ -1,5 +1,5 @@
 import json
-from utils.plotter import plot_scores, plot_scores_random_restart, plot_sa_results, confirm_folder
+from utils.plotter import plot_scores, plot_scores_random_restart, plot_sa_results, plot_ga, confirm_folder
 from utils.state import init_state, generate_slots
 from utils.objective import evaluate
 from utils.visualize_timetable import visualize_state
@@ -103,9 +103,11 @@ if __name__ == "__main__":
         algo_name = "Simulated Annealing"
 
     elif n == 6:
+        pop_size = 30
+        max_iter = 300
         print("\nStarting Genetic Algorithm...")
         start_time = time.time()
-        best_state, best_score, history = genetic_algorithm(data, slots, pop_size=3, max_iter=100)
+        best_state, best_score, history = genetic_algorithm(data, slots, pop_size, max_iter)
         duration = time.time() - start_time
         algo_name = "Genetic Algorithm"
 
@@ -137,6 +139,14 @@ if __name__ == "__main__":
         print(f"[INFO] Skor Akhir (Best): {best_score:.3f}")
         print("[INFO] Plot E(T) telah ditampilkan.")
         plot_sa_results(info['score_history'], info['boltzmann_history'])
+
+    # GA
+    if n == 6:
+        print(f"[INFO] Jumlah populasi: {pop_size}")
+        print(f"[INFO] Banyak iterasi: {max_iter}")
+        print(f"[INFO] Skor Akhir (Best): {best_score:.3f}")
+        print("[INFO] Plot E(T) telah ditampilkan.")
+        plot_ga(history, max_iter)
 
     # Visualisasi state awal dan best
     visualize_state(state_awal, ruangan, save_path="input/jadwal-awal.png", show=False)
