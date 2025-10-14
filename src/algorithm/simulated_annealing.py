@@ -48,14 +48,14 @@ def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, target
 
     print(f"[SA] Initial Score: {current_score:.4f}")
 
-    while T > T_min and current_score >= target_score:
+    while T > T_min and best_score > target_score:
         neighbor = getNeighbors(current, slots, data["kelas_mata_kuliah"])
         neighbor_score = evaluate(neighbor, data)
         
         delta = neighbor_score - current_score
         
         boltz_prob = boltzmann(delta, T) if delta > 0 else 1.0
-        print(boltz_prob)
+        # print(boltz_prob)
 
         accept = False
         if delta < 0:  
@@ -81,10 +81,10 @@ def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, target
         max_stuck = max(max_stuck, stuck_count)
 
         # Save history
-        score_history.append(best_score)
+        score_history.append(current_score)
         boltzmann_history.append(boltz_prob)
 
-        if best_score < target_score:
+        if best_score <= target_score:
             print(f"[SA] Target score reached at iteration {t}")
             break
         
@@ -96,48 +96,24 @@ def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, target
         t += 1
         T = schedule(t, T0, alpha)
 
+        if t % 100 == 0:
+            print(f"[SA] Iter {t} | T={T:.2f} | Score={current_score:.4f} | Best={best_score:.4f}")
+
+
+        if T <= T_min:
+            print(f"[SA] Temperature udah 0 di iterasi {t}")
+            break
+
 
     # Final report
     print(f"[SA] Final Score: {best_score:.4f}")
     print(f"[SA] Iterations: {t}")
     print(f"[SA] Max Stuck: {max_stuck}")
 
-    # Plotting
-    # plot_sa_results(score_history, boltzmann_history)
-
     return best_state, best_score, {
         'score_history': score_history,
         'boltzmann_history': boltzmann_history,
+        'initial_score': score_history[0] if score_history else current_score,
         'max_stuck': max_stuck,
         'iterations': t,
-        'initial_score': score_history[0] if score_history else current_score
     }
-
-
-# ==================== Plotting ====================
-
-def plot_sa_results(score_history, boltzmann_history, save_path="output/sa_plot.png"):
-    os.makedirs(os.path.dirname(save_path), exist_ok=True)
-
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
-    iterations = list(range(len(score_history)))
-
-    # Plot 1: Objective function (best score) vs iterasi
-    ax1.plot(iterations, score_history, 'b-', linewidth=2)
-    ax1.set_xlabel('Iterasi')
-    ax1.set_ylabel('Objective Function (Best Score)')
-    ax1.set_title('Nilai Objective Function terhadap Iterasi')
-    ax1.grid(True, alpha=0.3)
-
-    # Plot 2: boltzmann vs iterasi
-    ax2.plot(iterations, boltzmann_history, 'r-', linewidth=1)
-    ax2.set_xlabel('Iterasi')
-    ax2.set_ylabel('e^(-deltaE/T)')
-    ax2.set_title('Probabilitas Boltzmann terhadap Iterasi')
-    ax2.grid(True, alpha=0.3)
-
-    plt.tight_layout()
-
-    plt.savefig(save_path, dpi=300)
-    plt.close(fig) 
-    print(f"[SA] Plot saved to {save_path}")

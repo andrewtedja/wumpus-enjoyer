@@ -30,7 +30,7 @@ def print_timetable(state, ruangan_list):
 
 # ========================== MAIN ==========================
 if __name__ == "__main__":
-    with open("data/sample_input.json", "r") as input_file:
+    with open("src/data/sample_input.json", "r") as input_file:
         data = json.load(input_file)
 
     kelas_mata_kuliah = data["kelas_mata_kuliah"]

@@ -75,5 +75,5 @@ def evaluate(state, data) -> int:
     f3 = get_overcapacity(state, data)
     total = f1 + f2 + f3
 
-    print(f"[DEBUG] f1={f1}, f2={f2}, f3={f3}, total={total}")
+    # print(f"[DEBUG] f1={f1}, f2={f2}, f3={f3}, total={total}")
     return total
