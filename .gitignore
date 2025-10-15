@@ -3,6 +3,5 @@
 .venv_matplotlib
 venv/
 
-*test*
 __pycache__/
 *tempCodeRunner*
