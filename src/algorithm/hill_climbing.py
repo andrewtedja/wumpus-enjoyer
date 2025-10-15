@@ -49,97 +49,114 @@ def hill_climbing_steepest(state, data, slots, max_iter=1000):
     current_score = evaluate(current, data)
     visited = {tuple(sorted(current.items()))}
     scores = [current_score]
-    
+
+    print(f"[INIT] Nilai fungsi objektif awal = {current_score}")
+
     for step in range(max_iter):
-        neighbors = []
         attempts = 0
-        seen_candidates = set()
-        while not neighbors and attempts < 100:
-            candidate = getNeighbors(current, slots, data["kelas_mata_kuliah"])
+        candidate = None
+
+        # cari 1 neighbor yang valid
+        while attempts < 100:
             attempts += 1
-            if candidate is None:
+            print(f"[DEBUG] Percobaan neighbor ke-{attempts}")
+            neighbor = getNeighbors(current, slots, data["kelas_mata_kuliah"])
+            if neighbor is None:
+                print("[DEBUG] Tetangga yang dihasilkan tidak ada, coba lagi.")
                 continue
-            signature = tuple(sorted(candidate.items()))
-            if signature in visited or signature in seen_candidates:
+
+            signature = tuple(sorted(neighbor.items()))
+            if signature in visited:
+                print("[DEBUG] Tetangga sudah pernah dikunjungi, coba lagi.")
                 continue
-            neighbors.append(candidate)
-            seen_candidates.add(signature)
-        if not neighbors:
-            print("[DEBUG] Tidak ada tetangga yang valid ditemukan, stop.")
+
+            candidate = neighbor
+            visited.add(signature)
+            print("[DEBUG] Tetangga valid ditemukan.")
             break
-        
-        scored_neighbors = [(evaluate(neighbor, data), neighbor) for neighbor in neighbors]
-        scored_neighbors.sort(key=lambda x: x[0])
 
-        best_score, best_neighbor = scored_neighbors[0]
-        print(f"Step {step+1}: Nilai fungsi objektif awal = {current_score}, akhir = {best_score}")
+        # tidak ada tetangga baru
+        if candidate is None:
+            print("[STOP] Tidak ada tetangga valid ditemukan, berhenti.")
+            break
 
-        if best_score <= 0:
-            print("[DONE] Solusi optimal ditemukan")
-            current, current_score = best_neighbor, best_score
+        neighbor_score = evaluate(candidate, data)
+        print(f"[STEP {step+1}] Current={current_score}, Neighbor={neighbor_score}")
+
+        # evaluasi hasil
+        if neighbor_score < current_score:
+            current, current_score = candidate, neighbor_score
+            scores.append(current_score)
+        elif neighbor_score <= 0:
+            print("[DONE] Solusi optimal ditemukan.")
+            current, current_score = candidate, neighbor_score
             scores.append(current_score)
             break
-        elif best_score < current_score:
-            current, current_score = best_neighbor, best_score
-            scores.append(current_score)
-            side_count = 0
         else:
-            print("[DONE] Tidak ada perbaikan lebih lanjut, berhenti.")
+            print("[STOP] Tidak ada perbaikan lebih lanjut, berhenti.")
             break
-        visited.add(tuple(sorted(current.items())))
 
     return current, current_score, scores
+
 
 
 def hill_climbing_sideways(state, data, slots, max_iter=1000, max_side=20):
     current = state
     current_score = evaluate(current, data)
-    side_count = 0
     visited = {tuple(sorted(current.items()))}
     scores = [current_score]
-    
+    side_count = 0
+
+    print(f"[INIT] Nilai fungsi objektif awal = {current_score}")
+
     for step in range(max_iter):
-        neighbors = []
         attempts = 0
-        seen_candidates = set()
-        while not neighbors and attempts < 100:
-            candidate = getNeighbors(current, slots, data["kelas_mata_kuliah"])
+        candidate = None
+
+        # cari 1 neighbor yang valid
+        while attempts < 100:
             attempts += 1
-            if candidate is None:
+            print(f"[DEBUG] Percobaan neighbor ke-{attempts}")
+            neighbor = getNeighbors(current, slots, data["kelas_mata_kuliah"])
+            if neighbor is None:
+                print("[DEBUG] Tetangga yang dihasilkan tidak ada, coba lagi.")
                 continue
-            signature = tuple(sorted(candidate.items()))
-            if signature in visited or signature in seen_candidates:
+
+            signature = tuple(sorted(neighbor.items()))
+            if signature in visited:
+                print("[DEBUG] Tetangga sudah pernah dikunjungi, coba lagi.")
                 continue
-            neighbors.append(candidate)
-            seen_candidates.add(signature)
-        if not neighbors:
-            print("[DEBUG] Tidak ada tetangga yang valid ditemukan, stop.")
-            break
-        
-        scored_neighbors = [(evaluate(neighbor, data), neighbor) for neighbor in neighbors]
-        scored_neighbors.sort(key=lambda x: x[0])
 
-        best_score, best_neighbor = scored_neighbors[0]
-        print(f"Step {step+1}: Nilai fungsi objektif awal = {current_score}, akhir = {best_score}, Sideways Move = {side_count}")
-
-        if best_score <= 0:
-            print("[DONE] Solusi optimal ditemukan")
-            current, current_score = best_neighbor, best_score
-            scores.append(current_score)
+            candidate = neighbor
+            visited.add(signature)
+            print("[DEBUG] Tetangga valid ditemukan.")
             break
-        elif best_score < current_score:
-            current, current_score = best_neighbor, best_score
+
+        if candidate is None:
+            print("[STOP] Tidak ada tetangga valid ditemukan, berhenti.")
+            break
+
+        neighbor_score = evaluate(candidate, data)
+        print(f"[STEP {step+1}] Current={current_score}, Neighbor={neighbor_score}, Sideways={side_count}")
+
+        # evaluasi hasil
+        if neighbor_score < current_score:
+            current, current_score = candidate, neighbor_score
             scores.append(current_score)
             side_count = 0
-        elif best_score == current_score and side_count < max_side:
-            current, current_score = best_neighbor, best_score
+        elif neighbor_score == current_score and side_count < max_side:
+            print(f"[SIDEWAYS] Langkah datar ke-{side_count+1}")
+            current, current_score = candidate, neighbor_score
             scores.append(current_score)
-            print("[SIDEWAYS] Melakukan sideways move")
             side_count += 1
-        else:
-            print("[DONE] Tidak ada perbaikan lebih lanjut, berhenti.")
+        elif neighbor_score <= 0:
+            print("[DONE] Solusi optimal ditemukan.")
+            current, current_score = candidate, neighbor_score
+            scores.append(current_score)
             break
-        visited.add(tuple(sorted(current.items())))
+        else:
+            print("[STOP] Tidak ada perbaikan lebih lanjut, berhenti.")
+            break
 
     return current, current_score, scores
 
@@ -190,9 +207,11 @@ def hill_climbing_stochastic(state, data, slots, max_iter=1000, max_attempts=50)
 
         # generate neighbor yang belum pernah diambil
         while attempts < max_attempts:
+            print(f"[DEBUG] Mencari tetangga valid, percobaan ke-{attempts+1}")
             attempts += 1
             candidate = getNeighbors(current, slots, data["kelas_mata_kuliah"])
             if candidate is None:
+                print("[DEBUG] Tetangga yang dihasilkan tidak ada, coba lagi.")
                 continue
 
             key = tuple(sorted(candidate.items()))
@@ -200,6 +219,9 @@ def hill_climbing_stochastic(state, data, slots, max_iter=1000, max_attempts=50)
                 neighbor = candidate
                 visited.add(key)
                 break
+            else:
+                print("[DEBUG] Tetangga sudah pernah dikunjungi, coba lagi.")
+                continue
 
         # kalau gak ada neighbor baru
         if neighbor is None:

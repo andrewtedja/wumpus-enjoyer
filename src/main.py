@@ -90,7 +90,7 @@ if __name__ == "__main__":
     elif n == 3:
         print("\nStarting Hill Climbing with Random Restart...")
         start_time = time.time()
-        final_state, final_score, scores = hill_climbing_random_restart(state_awal, data, slots, max_restarts=10, max_iter=1000)
+        final_state, final_score, scores = hill_climbing_random_restart(state_awal, data, slots, max_restarts=100, max_iter=1000)
         duration = time.time() - start_time
         algo_name = "Hill Climbing (Random Restart)"
 
