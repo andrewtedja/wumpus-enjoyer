@@ -67,7 +67,7 @@ def plot_sa_results(score_history, boltzmann_history, algorithm="sa"):
 
 # ==================== Genetic Algorithm ====================
 
-def plot_ga(history, max_iter, algorithm="GA"):
+def plot_ga(history, max_iter, algorithm="ga"):
     generations = [h["generation"] for h in history]
     best_scores = [h["best"] for h in history]
     avg_scores = [h["avg"] for h in history]

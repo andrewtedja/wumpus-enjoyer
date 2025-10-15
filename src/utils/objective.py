@@ -65,7 +65,7 @@ def get_overcapacity(state, data) -> int:
         jmhs = info_kelas[kode]["jumlah_mahasiswa"]
         cap = kuota_ruang[ruang]
         if jmhs > cap:
-            score += (jmhs - cap) * 2
+            score += (jmhs - cap) * info_kelas[kode]["sks"]
     return score
 
 # ===================== TOTAL SCORE =====================
