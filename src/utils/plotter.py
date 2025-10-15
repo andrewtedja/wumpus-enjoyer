@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import os
 
 def confirm_folder(algorithm_name: str):
-    folder = f"output\{algorithm_name.lower()}"
+    folder = f"output/{algorithm_name.lower()}"
     os.makedirs(folder, exist_ok=True)
     return folder
 
@@ -67,10 +67,12 @@ def plot_sa_results(score_history, boltzmann_history, algorithm="sa"):
 
 # ==================== Genetic Algorithm ====================
 
-def plot_ga(history, max_iter):
+def plot_ga(history, max_iter, algorithm="GA"):
     generations = [h["generation"] for h in history]
     best_scores = [h["best"] for h in history]
     avg_scores = [h["avg"] for h in history]
+    folder = confirm_folder(algorithm)
+    save_path = os.path.join(folder, f"{algorithm}_plot.png")
 
     if max_iter is not None and len(generations) < max_iter:
         last_best = best_scores[-1] if best_scores else 0
@@ -89,4 +91,5 @@ def plot_ga(history, max_iter):
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig("genetic-algorithm-result.png")
+    plt.savefig(save_path, dpi=300)
+    print(f"[{algorithm}] Plot saved to {save_path}")
