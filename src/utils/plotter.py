@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import os
 
 def confirm_folder(algorithm_name: str):
-    folder = f"output/{algorithm_name.lower()}"
+    folder = f"output\{algorithm_name.lower()}"
     os.makedirs(folder, exist_ok=True)
     return folder
 
