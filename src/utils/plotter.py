@@ -49,7 +49,7 @@ def plot_sa_results(score_history, boltzmann_history, algorithm="sa"):
     # Plot 1: Objective function (best score) vs iterasi
     ax1.plot(iterations, score_history, 'b-', linewidth=2)
     ax1.set_xlabel('Iterasi')
-    ax1.set_ylabel('Objective Function (Best Score)')
+    ax1.set_ylabel('Objective Function')
     ax1.set_title('Nilai Objective Function terhadap Iterasi')
     ax1.grid(True, alpha=0.3)
 
