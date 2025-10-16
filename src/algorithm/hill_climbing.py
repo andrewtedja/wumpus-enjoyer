@@ -146,7 +146,10 @@ def hill_climbing_random_restart(data, slots, max_restarts=10):
             best_score = final_score
             best_state = final_state
 
-        print(f"[RESTART {restart+1}] Score terbaik = {final_score}")
+        print(f"[RESTART {restart+1}] Score akhir = {final_score}")
+        if final_score == 0:
+            print("[DONE] Solusi optimal ditemukan, berhenti restart.")
+            break
 
     print(f"\n[FINAL] Skor terbaik dari semua restart = {best_score}")
     return best_state, best_score, best_scores
@@ -176,8 +179,13 @@ def hill_climbing_stochastic(state, data, slots, max_iter=1000):
         next_score = evaluate(next_state, data)
         print(f"[STEP {step+1}] {current_score} -> {next_score}")
 
-        current, current_score = next_state, next_score
-        scores.append(current_score)
+
+        if next_score < current_score:
+            current, current_score = next_state, next_score
+            scores.append(current_score)
+            print(f"[UPDATE] Score diperbarui menjadi {current_score}")
+        else:
+            print("[NO UPDATE] Score tidak berubah.")
 
         if current_score <= 0:
             print("[DONE] Solusi optimal ditemukan.")
