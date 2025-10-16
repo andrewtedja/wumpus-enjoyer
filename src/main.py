@@ -78,7 +78,7 @@ if __name__ == "__main__":
     elif n == 2:
         print("\nStarting Hill Climbing with Sideways Move...")
         start_time = time.time()
-        final_state, final_score, scores = hill_climbing_sideways(state_awal, data, slots, max_side=500)
+        final_state, final_score, scores = hill_climbing_sideways(state_awal, data, slots, max_side=100)
         duration = time.time() - start_time
         algo_name = "Hill Climbing (Sideways Move)"
 
@@ -116,7 +116,7 @@ if __name__ == "__main__":
         info = simulated_annealing(
             state_awal, data, slots,
             T0=1000, T_min=1, alpha=0.95,
-            patience=500, max_iter=10000
+            patience=20, max_iter=10000
         )
 
         duration = time.time() - start_time

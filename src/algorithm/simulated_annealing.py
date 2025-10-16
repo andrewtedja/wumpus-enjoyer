@@ -1,6 +1,6 @@
 import math, random, copy
 from utils.objective import evaluate
-from .hill_climbing import getNeighbors
+from .hill_climbing import getSuccessors
 import matplotlib.pyplot as plt
 import time
 import os
@@ -27,63 +27,91 @@ def boltzmann(deltaE, T) -> float:
         return float('inf')
 
 
-# ==================== Simulated Annealing ====================
-def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, patience = 500, max_iter=10000):
+def getSuccessor(state, slots, kelas_mata_kuliah):
+    filled_slots = list(state.keys())
+    if not filled_slots:
+        return None
 
+    slot_lama = random.choice(filled_slots)
+    kode_kelas = state[slot_lama]
+
+    # nyoba pindahin ke setiap slot lain (baik kosong maupun terisi)
+    possible_slots = [slot for slot in slots if slot != slot_lama]
+    if not possible_slots:
+        return None
+    
+    slot_baru = random.choice(possible_slots)
+    # salin state lama untuk dimodifikasi
+    successor = copy.deepcopy(state)
+
+    if slot_baru not in state: # kosong
+        # ======================= MOVE =======================
+        del successor[slot_lama]
+        successor[slot_baru] = kode_kelas
+    else: # ada isinya
+        # ======================= SWAP =======================
+        other_kelas = state[slot_baru]
+        successor[slot_lama] = other_kelas
+        successor[slot_baru] = kode_kelas
+
+    return successor
+
+# ==================== Simulated Annealing ====================
+def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, patience = 50, max_iter=10000):
     current = copy.deepcopy(state)
     current_score = evaluate(current, data)
-
-
     # Save history (iter, score, E(T), T)
+
+    best_score = current_score
+
     score_history = []         
     boltzmann_history = []
-    stuck_count = 0
     stuck_events = 0
-    no_improvement_count = 0
+    no_improvement_counter = 0
 
     t = 0
     T = T0
-
-    print(f"[SA] Initial Score: {current_score:.4f}")
-
     while T > T_min and t < max_iter:
         # note: ada tambahan heuristik target_score atau threshold score (0.0001)  
-        neighbor = getNeighbors(current, slots, data["kelas_mata_kuliah"])
+        neighbor = getSuccessor(current, slots, data["kelas_mata_kuliah"])
         neighbor_score = evaluate(neighbor, data)
         
         delta = neighbor_score - current_score
         
-        boltz_prob = boltzmann(delta, T) if delta > 0 else 1.0
-        # print(boltz_prob)
+
+        if delta < 0:  
+            boltz_prob = 1.0
+        else:  
+            boltz_prob = boltzmann(delta, T)
 
         accept = False
-        if delta < 0:  
+        if delta < 0:
             accept = True
-        else:  
-            if random.random() < boltz_prob:
+        else:
+            rand_val = random.random()
+            if rand_val < boltz_prob:
                 accept = True
 
+        # Move
         if accept:
             current = neighbor
             current_score = neighbor_score
-            
-            no_improvement_count = 0
-
-            if stuck_count > 0:
-                stuck_events += 1
-            stuck_count = 0
-        else:
-            stuck_count += 1
-            no_improvement_count += 1
         
+        if current_score < best_score:
+            best_score = current_score
+            no_improvement_counter = 0
+        else:
+            no_improvement_counter += 1
+        
+        if no_improvement_counter >= patience:
+            stuck_events += 1
+            print(f"[SA] Stuck events #{stuck_events} (no improvement for {patience} iterations)")
+            no_improvement_counter = 0
+
 
         # Save history
         score_history.append(current_score)
         boltzmann_history.append(boltz_prob)
-
-        if no_improvement_count >= patience:
-            print(f"[SA] No improvement for {patience} iterations")
-            break
 
         # Update
         t += 1
@@ -92,15 +120,9 @@ def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, patien
         if t % 100 == 0:
             print(f"[Periodic 100 Report] Iter {t} | T={T:.3f} | Score={current_score:.3f}")
 
-
         if T <= T_min:
             print(f"[SA] Temperature udah 0 di iterasi {t}")
             break
-
-
-    # Final report
-    # print(f"[SA] Final Score: {current_score:.3f}")
-    # print(f"[SA] Iterations: {t}, Max Iterations: {max_iter}")
 
     return {
         'final_state': current,
