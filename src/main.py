@@ -67,7 +67,7 @@ if __name__ == "__main__":
     if n == 1:
         print("\nStarting Hill Climbing (Steepest)...")
         start_time = time.time()
-        final_state, final_score, scores = hill_climbing_steepest(state_awal, data, slots, max_iter=1000)
+        final_state, final_score, scores = hill_climbing_steepest(state_awal, data, slots)
         duration = time.time() - start_time
         algo_name = "Hill Climbing (Steepest)"
 
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     elif n == 2:
         print("\nStarting Hill Climbing with Sideways Move...")
         start_time = time.time()
-        final_state, final_score, scores = hill_climbing_sideways(state_awal, data, slots, max_iter=1000, max_side=500)
+        final_state, final_score, scores = hill_climbing_sideways(state_awal, data, slots, max_side=500)
         duration = time.time() - start_time
         algo_name = "Hill Climbing (Sideways Move)"
 
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     elif n == 3:
         print("\nStarting Hill Climbing with Random Restart...")
         start_time = time.time()
-        final_state, final_score, scores = hill_climbing_random_restart(state_awal, data, slots, max_restarts=100, max_iter=1000)
+        final_state, final_score, scores = hill_climbing_random_restart(data, slots, max_restarts=100)
         duration = time.time() - start_time
         algo_name = "Hill Climbing (Random Restart)"
 
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     elif n == 4:
         print("\nStarting Stochastic Hill Climbing...")
         start_time = time.time()
-        final_state, final_score, scores = hill_climbing_stochastic(state_awal, data, slots, max_iter=1000, max_attempts=50)
+        final_state, final_score, scores = hill_climbing_stochastic(state_awal, data, slots, max_iter=1000)
         duration = time.time() - start_time
         algo_name = "Stochastic Hill Climbing"
 
