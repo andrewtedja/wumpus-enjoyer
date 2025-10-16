@@ -1,6 +1,6 @@
 import math, random, copy
 from utils.objective import evaluate
-from .hill_climbing import getNeighbors
+from .hill_climbing import getSuccessors
 import matplotlib.pyplot as plt
 import time
 import os
@@ -27,6 +27,35 @@ def boltzmann(deltaE, T) -> float:
         return float('inf')
 
 
+def getSuccessor(state, slots, kelas_mata_kuliah):
+    filled_slots = list(state.keys())
+    if not filled_slots:
+        return None
+
+    slot_lama = random.choice(filled_slots)
+    kode_kelas = state[slot_lama]
+
+    # nyoba pindahin ke setiap slot lain (baik kosong maupun terisi)
+    possible_slots = [slot for slot in slots if slot != slot_lama]
+    if not possible_slots:
+        return None
+    
+    slot_baru = random.choice(possible_slots)
+    # salin state lama untuk dimodifikasi
+    successor = copy.deepcopy(state)
+
+    if slot_baru not in state: # kosong
+        # ======================= MOVE =======================
+        del successor[slot_lama]
+        successor[slot_baru] = kode_kelas
+    else: # ada isinya
+        # ======================= SWAP =======================
+        other_kelas = state[slot_baru]
+        successor[slot_lama] = other_kelas
+        successor[slot_baru] = kode_kelas
+
+    return successor
+
 # ==================== Simulated Annealing ====================
 def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, patience = 50, max_iter=10000):
     current = copy.deepcopy(state)
@@ -44,7 +73,7 @@ def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, patien
     T = T0
     while T > T_min and t < max_iter:
         # note: ada tambahan heuristik target_score atau threshold score (0.0001)  
-        neighbor = getNeighbors(current, slots, data["kelas_mata_kuliah"])
+        neighbor = getSuccessor(current, slots, data["kelas_mata_kuliah"])
         neighbor_score = evaluate(neighbor, data)
         
         delta = neighbor_score - current_score

@@ -2,35 +2,37 @@ import copy
 import random
 from utils.objective import evaluate
 
-def getNeighbors(state, slots, kelas_mata_kuliah):
-    neighbors = []
+def getSuccessors(state, slots, kelas_mata_kuliah):
+    succesors = []
     filled_slots = list(state.keys())
-    empty_slots = [slot for slot in slots if slot not in state]
 
-    # ======================= MOVE =======================
     for slot_lama in filled_slots:
         kode_kelas = state[slot_lama]
-        for slot_baru in empty_slots:
-            neighbor = copy.deepcopy(state)
-            # pindahkan kelas dari slot_lama ke slot_baru
-            del neighbor[slot_lama]
-            neighbor[slot_baru] = kode_kelas
-            neighbors.append(neighbor)
 
-    # ======================= SWAP =======================
-    for i in range(len(filled_slots)):
-        for j in range(i + 1, len(filled_slots)):
-            slot1, slot2 = filled_slots[i], filled_slots[j]
-            if state[slot1] == state[slot2]:
-                continue  # gak perlu swap kelas yang sama
+        # nyoba pindahin ke setiap slot lain (baik kosong maupun terisi)
+        for slot_baru in slots:
+            if slot_baru == slot_lama:
+                continue  
 
-            neighbor = copy.deepcopy(state)
-            # tukar kelas di slot1 dan slot2
-            neighbor[slot1], neighbor[slot2] = neighbor[slot2], neighbor[slot1]
-            neighbors.append(neighbor)
+            succesor = copy.deepcopy(state)
 
-    return neighbors
+            if slot_baru not in state: # Kosong
+                # ======================= MOVE =======================
+                # hapus dari slot lama, pindahkan ke slot baru (kosong)
+                del succesor[slot_lama]
+                succesor[slot_baru] = kode_kelas
+            else: # Filled
+                # ======================= SWAP =======================
+                # slot_baru terisi -> tukar isi dua slot
+                other_kelas = state[slot_baru]
+                succesor[slot_lama] = other_kelas
+                succesor[slot_baru] = kode_kelas
 
+            succesors.append(succesor)
+
+    return succesors
+
+# Steepest HC (terminate on peak/flat)
 def hill_climbing_steepest(state, data, slots):
     current = state
     current_score = evaluate(current, data)
@@ -38,38 +40,38 @@ def hill_climbing_steepest(state, data, slots):
 
     print(f"[INIT] Nilai fungsi objektif awal = {current_score}")
     step = 0
-
+    
     while current_score > 0:
         step += 1
-        neighbors = getNeighbors(current, slots, data["kelas_mata_kuliah"])
-        if not neighbors:
+        succesors = getSuccessors(current, slots, data["kelas_mata_kuliah"])
+        if not succesors:
             print("[STOP] Tidak ada tetangga ditemukan.")
             break
 
-        # evaluasi semua tetangga
-        scored_neighbors = [(evaluate(n, data), n) for n in neighbors]
-        scored_neighbors.sort(key=lambda x: x[0])  # ambil skor terkecil
-        best_score, best_neighbor = scored_neighbors[0]
+        evaluated = [(evaluate(n, data), n) for n in succesors]
+        evaluated.sort(key=lambda x: x[0])  # ambil skor terkecil
+        best_score, best_state = evaluated[0]
 
-        print(f"[STEP {step+1}] Current={current_score}, BestNeighbor={best_score}")
+        print(f"[STEP {step+1}] Current={current_score}, CurrentBestSucc={best_score}")
 
-        # kalau gak ada perbaikan, stop
-        if best_score >= current_score:
-            print("[STOP] Tidak ada perbaikan lebih lanjut (local optimum).")
+        # stop condition (successor same or worse)
+        all_worse_or_equal = all(score >= current_score for score, _ in evaluated)
+        if all_worse_or_equal:
+            print("[STOP] Semua successor sama atau lebih buruk (local optimum tercapai).")
             break
 
         # update
-        current, current_score = best_neighbor, best_score
+        current, current_score = best_state, best_score
         scores.append(current_score)
 
         if current_score <= 0:
-            print("[DONE] Solusi optimal ditemukan.")
+            print("[DONE] Solusi global optimal ditemukan.")
             break
 
     return current, current_score, scores
 
-
-def hill_climbing_sideways(state, data, slots, max_side=20):
+# Sideways HC (terminate on peak)
+def hill_climbing_sideways(state, data, slots, max_side=100):
     current = state
     current_score = evaluate(current, data)
     scores = [current_score]
@@ -80,31 +82,38 @@ def hill_climbing_sideways(state, data, slots, max_side=20):
     step = 0
     while current_score > 0:
         step += 1
-        neighbors = getNeighbors(current, slots, data["kelas_mata_kuliah"])
-        if not neighbors:
-            print("[STOP] Tidak ada tetangga ditemukan.")
+        successors = getSuccessors(current, slots, data["kelas_mata_kuliah"])
+        if not successors:
+            print("[STOP] Tidak ada successor ditemukan.")
             break
 
-        scored_neighbors = [(evaluate(n, data), n) for n in neighbors]
-        scored_neighbors.sort(key=lambda x: x[0])
-        best_score, best_neighbor = scored_neighbors[0]
+        evaluated = [(evaluate(s, data), s) for s in successors]
+        evaluated.sort(key=lambda x: x[0])
+        best_score, best_state = evaluated[0]
 
-        print(f"[STEP {step+1}] Current={current_score}, BestNeighbor={best_score}, Sideways={side_count}")
+        print(f"[STEP {step}] Current={current_score}, BestNeighbor={best_score}, Sideways={side_count}")
 
-        # jika skor lebih baik
+        # stop condition (successor worse, same masih diambil until max_side)
+        all_worse = all(score > current_score for score, _ in evaluated)
+        all_equal = all(score == current_score for score, _ in evaluated)
+
+        if all_worse or (all_equal and side_count >= max_side):
+            print("[STOP] Semua successor lebih buruk atau sudah melewati batas max_side.")
+            break
+
         if best_score < current_score:
-            current, current_score = best_neighbor, best_score
+            current, current_score = best_state, best_score
             scores.append(current_score)
             side_count = 0
-        # jika skor sama, boleh jalan datar
         elif best_score == current_score and side_count < max_side:
             side_count += 1
-            current, current_score = best_neighbor, best_score
+            current, current_score = best_state, best_score
             scores.append(current_score)
             print(f"[SIDEWAYS] Langkah datar ke-{side_count}")
         else:
             print("[STOP] Tidak ada perbaikan lebih lanjut, berhenti.")
             break
+
 
         if current_score <= 0:
             print("[DONE] Solusi optimal ditemukan.")
@@ -112,6 +121,7 @@ def hill_climbing_sideways(state, data, slots, max_side=20):
 
     return current, current_score, scores
 
+# RANDOM RESTART HC
 def hill_climbing_random_restart(data, slots, max_restarts=10):
     best_state = None
     best_score = float('inf')
@@ -151,6 +161,7 @@ def hill_climbing_random_restart(data, slots, max_restarts=10):
     print(f"\n[FINAL] Skor terbaik dari semua restart = {best_score}")
     return best_state, best_score, best_scores
 
+# Stochastic HC (terminate on flat)
 def hill_climbing_stochastic(state, data, slots, max_iter=1000):
     current = state
     current_score = evaluate(current, data)
@@ -159,20 +170,20 @@ def hill_climbing_stochastic(state, data, slots, max_iter=1000):
     print(f"[INIT] Score awal = {current_score}")
 
     for step in range(max_iter):
-        neighbors = getNeighbors(current, slots, data["kelas_mata_kuliah"])
-        if not neighbors:
+        successor = getSuccessors(current, slots, data["kelas_mata_kuliah"])
+        if not successor:
             print("[STOP] Tidak ada tetangga ditemukan.")
             break
 
         # ambil tetangga yang lebih baik dari current
-        better_neighbors = [n for n in neighbors if evaluate(n, data) < current_score]
+        better_successor = [n for n in successor if evaluate(n, data) < current_score]
 
-        if not better_neighbors:
+        if not better_successor:
             print("[STOP] Tidak ada neighbor yang lebih baik, berhenti.")
             break
 
         # pilih 1 random dari yang lebih baik
-        next_state = random.choice(better_neighbors)
+        next_state = random.choice(better_successor)
         next_score = evaluate(next_state, data)
         print(f"[STEP {step+1}] {current_score} -> {next_score}")
 
