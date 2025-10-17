@@ -57,7 +57,7 @@ def getSuccessor(state, slots, kelas_mata_kuliah):
     return successor
 
 # ==================== Simulated Annealing ====================
-def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, patience = 50, max_iter=10000):
+def simulated_annealing(state, data, slots, max_iter, T0=1000, T_min=1, alpha=0.95, patience = 40):
     current = copy.deepcopy(state)
     current_score = evaluate(current, data)
     # Save history (iter, score, E(T), T)
@@ -66,8 +66,13 @@ def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, patien
 
     score_history = []         
     boltzmann_history = []
+
     stuck_events = 0
-    no_improvement_counter = 0
+
+    score_basin = current_score
+    iterations_in_basin = 0
+
+    tolerance = 0.01
 
     t = 0
     T = T0
@@ -83,11 +88,13 @@ def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, patien
 
         print(f"[SA] Iter {t}: Current={current_score}, Best={best_score}, T={T}")
 
+        # Boltzmann
         if delta < 0:  
             boltz_prob = 1.0
         else:  
             boltz_prob = boltzmann(delta, T)
 
+        # Accept
         accept = False
         if delta < 0:
             accept = True
@@ -96,21 +103,29 @@ def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, patien
             if rand_val < boltz_prob:
                 accept = True
 
-        # Move
         if accept:
             current = neighbor
             current_score = neighbor_score
         
         if current_score < best_score:
             best_score = current_score
-            no_improvement_counter = 0
-        elif current_score == best_score:
-            no_improvement_counter += 1
+        
+        # Stuck -> berada dalem basin for more than patience
+        if score_basin == 0:
+            rel_diff = abs(current_score - score_basin) 
+        else:
+            rel_diff = abs(current_score - score_basin) / abs(score_basin)
 
-        if no_improvement_counter >= patience:
+        if rel_diff <= tolerance:
+            iterations_in_basin += 1    
+        else:
+            score_basin = current_score
+            iterations_in_basin = 1
+
+        if iterations_in_basin >= patience:
             stuck_events += 1
-            print(f"[SA] Stuck events #{stuck_events} on iter {t} (no improvement for {patience} iterations)")
-            no_improvement_counter = 0
+            print(f"[SA] Local optimum stuck event #{stuck_events} on iter {t}")
+            iterations_in_basin = 0
 
 
         # Save history
@@ -122,7 +137,7 @@ def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, patien
         T = schedule(t, T0, alpha)
 
         if t % 100 == 0:
-            print(f"[Periodic 100 Report] Iter {t} | T={T:.3f} | Score={current_score:.3f}")
+            print(f"[Periodic 100 Report] Iter {t} | T={T:.3f} | Score={current_score:.3f}, Best={best_score:.3f}")
 
         if T <= T_min:
             print(f"[SA] Temperature udah 0 di iterasi {t}")

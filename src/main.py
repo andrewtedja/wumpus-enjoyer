@@ -114,12 +114,18 @@ if __name__ == "__main__":
         plot_scores(scores, f"{algo_name} - Nilai Fungsi Objektif per Iterasi")
 
     elif n == 5:
+        user_input = input("Masukkan jumlah maksimal iterasi (kosongkan untuk default (1000)): ").strip()
+        if (user_input):
+            max_iter = int(user_input)
+        else:
+            max_iter = 1000
+        
         print("\nStarting Simulated Annealing...")
         start_time = time.time()
         info = simulated_annealing(
-            state_awal, data, slots,
-            T0=1000, T_min=1, alpha=0.95,
-            patience=10, max_iter=10000
+            state_awal, data, slots, max_iter=max_iter,
+            T0=1000, T_min=1, alpha=0.98,
+            patience=40
         )
 
         duration = time.time() - start_time
