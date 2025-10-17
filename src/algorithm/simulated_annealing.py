@@ -78,6 +78,10 @@ def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, patien
         
         delta = neighbor_score - current_score
         
+        # print(f"Current #{t}:", current_score)
+        # print(f"Best: #{t}", best_score)
+
+        print(f"[SA] Iter {t}: Current={current_score}, Best={best_score}, T={T}")
 
         if delta < 0:  
             boltz_prob = 1.0
@@ -100,12 +104,12 @@ def simulated_annealing(state, data, slots, T0=1000, T_min=1, alpha=0.95, patien
         if current_score < best_score:
             best_score = current_score
             no_improvement_counter = 0
-        else:
+        elif current_score == best_score:
             no_improvement_counter += 1
-        
+
         if no_improvement_counter >= patience:
             stuck_events += 1
-            print(f"[SA] Stuck events #{stuck_events} (no improvement for {patience} iterations)")
+            print(f"[SA] Stuck events #{stuck_events} on iter {t} (no improvement for {patience} iterations)")
             no_improvement_counter = 0
 
 
