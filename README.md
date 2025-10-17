@@ -57,6 +57,23 @@
 -   **Plot & Visualization**: Timetable generation and algorithm performance plots
 -   **Output**: performance metrics such as objective function values, time taken, number of iterations, and more
 
+### Bonus Done:
+
+<table>
+    <tr>
+        <th>Variant</th>
+        <th>Done</th>
+    </tr>
+    <tr>
+        <td>All Hill Climbing Variants</td>
+        <td>✅</td>
+    </tr>
+    <tr>
+        <td>Lecturer Schedule</td>
+        <td>✅</td>
+    </tr>
+</table>
+
 ---
 
 ## Algorithms Implemented
@@ -215,6 +232,21 @@ The system accepts JSON input files with the following structure:
 }
 ```
 
+Bonus: jadwal dosen
+
+```json
+"dosen": [
+		{
+			"nama": "Dr. Andi",
+			"mengajar": ["IF3110", "IF3170"],
+			"waktu_sibuk": [
+				{ "hari": "Senin", "jam": [9, 11] },
+				{ "hari": "Rabu", "jam": [14, 16] }
+			]
+        },
+]
+```
+
 ### Input Components
 
 | Component             | Description         | Attributes                        |
@@ -222,8 +254,7 @@ The system accepts JSON input files with the following structure:
 | **kelas_mata_kuliah** | Course information  | `kode`, `jumlah_mahasiswa`, `sks` |
 | **ruangan**           | Room specifications | `kode`, `kuota`                   |
 | **mahasiswa**         | Student enrollments | `nim`, `daftar_mk`, `prioritas`   |
-
----
+| **dosen**             | Lecturer's schedule | `nama`, `mengajar`, `waktu_sibuk` |
 
 ## Output & Visualization
 
