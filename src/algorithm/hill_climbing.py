@@ -126,6 +126,7 @@ def hill_climbing_random_restart(data, slots, max_restarts=10):
     best_state = None
     best_score = float('inf')
     best_scores = []
+    scores_per_restart = []
 
     for restart in range(max_restarts):
         print(f"\n[RESTART {restart+1}]")
@@ -149,7 +150,8 @@ def hill_climbing_random_restart(data, slots, max_restarts=10):
                         break
 
         # jalankan steepest ascent
-        final_state, final_score, _ = hill_climbing_steepest(initial_state, data, slots)
+        final_state, final_score, scores = hill_climbing_steepest(initial_state, data, slots)
+        scores_per_restart.append(scores)
         best_scores.append(final_score)
 
         if final_score < best_score:
@@ -162,7 +164,7 @@ def hill_climbing_random_restart(data, slots, max_restarts=10):
             break
 
     print(f"\n[FINAL] Skor terbaik dari semua restart = {best_score}")
-    return best_state, best_score, best_scores
+    return best_state, best_score, best_scores, scores_per_restart
 
 # Stochastic HC (terminate on flat)
 def hill_climbing_stochastic(state, data, slots, max_iter=1000):

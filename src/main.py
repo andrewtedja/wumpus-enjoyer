@@ -76,9 +76,10 @@ if __name__ == "__main__":
         plot_scores(scores, f"{algo_name} - Nilai Fungsi Objektif per Iterasi")
 
     elif n == 2:
+        max_side = int(input("Masukkan maksimal langkah sideways (default 100): ") or "100")
         print("\nStarting Hill Climbing with Sideways Move...")
         start_time = time.time()
-        final_state, final_score, scores = hill_climbing_sideways(state_awal, data, slots, max_side=100)
+        final_state, final_score, scores = hill_climbing_sideways(state_awal, data, slots, max_side)
         duration = time.time() - start_time
         algo_name = "Hill Climbing (Sideways Move)"
 
@@ -88,21 +89,23 @@ if __name__ == "__main__":
         plot_scores(scores, f"{algo_name} - Nilai Fungsi Objektif per Iterasi")
 
     elif n == 3:
+        max_restarts = int(input("Masukkan jumlah maksimal restart (default 10): ") or "10")
         print("\nStarting Hill Climbing with Random Restart...")
         start_time = time.time()
-        final_state, final_score, scores = hill_climbing_random_restart(data, slots, max_restarts=100)
+        final_state, final_score, scores, scores_per_restart = hill_climbing_random_restart(data, slots, max_restarts)
         duration = time.time() - start_time
         algo_name = "Hill Climbing (Random Restart)"
 
         print(f"\n[INFO] Total Restart: {len(scores)}")
         print(f"[INFO] Skor Akhir: {final_score:.3f}")
 
-        plot_scores_random_restart(scores)
+        plot_scores_random_restart(scores_per_restart, scores)
 
     elif n == 4:
+        max_iter = int(input("Masukkan jumlah maksimal iterasi (default 1000): ") or "1000")
         print("\nStarting Stochastic Hill Climbing...")
         start_time = time.time()
-        final_state, final_score, scores = hill_climbing_stochastic(state_awal, data, slots, max_iter=1000)
+        final_state, final_score, scores = hill_climbing_stochastic(state_awal, data, slots, max_iter)
         duration = time.time() - start_time
         algo_name = "Stochastic Hill Climbing"
 

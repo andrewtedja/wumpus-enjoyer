@@ -23,16 +23,30 @@ def plot_scores(scores, title, algorithm="hc"):
     print(f"[{algorithm}] Plot saved to {save_path}")
 
 
-def plot_scores_random_restart(best_scores, algorithm="hc"):
+def plot_scores_random_restart(scores_per_restart, best_scores, algorithm="hc_random_restart"):
+    # ========== Konfirmasi folder output ==========
     folder = confirm_folder(algorithm)
     save_path = os.path.join(folder, f"{algorithm}_plot.png")
 
     plt.figure(figsize=(10, 6))
-    plt.plot(range(1, len(best_scores) + 1), best_scores, marker='o', color='orange')
-    plt.title('Best Scores dari Setiap Restart')
-    plt.xlabel('Restart ke-')
-    plt.ylabel('Best Score')
-    plt.grid(True)
+
+    # ========== Plot per restart ==========
+    for i, scores in enumerate(scores_per_restart):
+        plt.plot(range(1, len(scores) + 1), scores, label=f"Restart {i+1}", alpha=0.6)
+    
+    # ========== Plot best score tiap restart ==========
+    plt.plot(range(1, len(best_scores) + 1), best_scores, 
+             color='orange', marker='o', linewidth=2.5, label="Best score tiap restart")
+
+    # ========== Label dan Tampilan ==========
+    plt.title("Perubahan Nilai Fungsi Objektif per Restart (Hill Climbing Random Restart)")
+    plt.xlabel("Iterasi / Restart")
+    plt.ylabel("Nilai Fungsi Objektif")
+    plt.legend(loc='upper right', fontsize=9)
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.tight_layout()
+
+    # ========== Save dan Info ==========
     plt.savefig(save_path, dpi=300)
     plt.close()
     print(f"[{algorithm}] Plot saved to {save_path}")
