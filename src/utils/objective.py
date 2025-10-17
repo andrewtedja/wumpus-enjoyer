@@ -68,12 +68,35 @@ def get_overcapacity(state, data) -> int:
             score += (jmhs - cap) * info_kelas[kode]["sks"]
     return score
 
+# ===================== DOSEN =====================
+
+def get_bentrok_dosen(state, data) -> int:
+    score = 0
+    if "dosen" not in data:
+        return 0
+
+    dosen_blocks = {d["nama"]: d.get("waktu_sibuk", []) for d in data["dosen"]}
+    dosen_map = {kode: d["nama"] for d in data["dosen"] for kode in d.get("mengajar", [])}
+
+    for (hari, jam, ruang), kode in state.items():
+        dosen = dosen_map.get(kode)
+        if not dosen:
+            continue
+
+        for block in dosen_blocks.get(dosen, []):
+            if block["hari"] == hari and jam in block["jam"]:
+                score += 5 
+                break  
+    return score
+
+
 # ===================== TOTAL SCORE =====================
 def evaluate(state, data) -> int:
     f1 = get_bentrok_mahasiswa(state, data)
     f2 = get_bentrok_ruangan_berbobot(state, data)
     f3 = get_overcapacity(state, data)
-    total = f1 + f2 + f3
+    f4 = get_bentrok_dosen(state, data)
+    total = f1 + f2 + f3 + f4
 
-    # print(f"[DEBUG] f1={f1}, f2={f2}, f3={f3}, total={total}")
+    # print(f"[DEBUG] f1={f1}, f2={f2}, f3={f3}, f4={f4}, total={total}")
     return total
