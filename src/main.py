@@ -119,7 +119,7 @@ if __name__ == "__main__":
         info = simulated_annealing(
             state_awal, data, slots,
             T0=1000, T_min=1, alpha=0.95,
-            patience=20, max_iter=10000
+            patience=10, max_iter=10000
         )
 
         duration = time.time() - start_time
