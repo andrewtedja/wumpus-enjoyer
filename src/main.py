@@ -15,13 +15,14 @@ def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 if __name__ == "__main__":
-    print("=" * 60)
-    print("Tugas Besar 1 IF3170 - Local Search Scheduler")
-    print("by Wumpus Enjoyer")
-    print("=" * 60)
+    clear_screen()
+    print("╔══════════════════════════════════════════════════════╗")
+    print("║ Tugas Besar 1 - Artificial Intelligence              ║")
+    print("║ by Wumpus Enjoyer                                    ║")
+    print("╚══════════════════════════════════════════════════════╝")
 
     # ========================== Read Input (JSON) ==========================
-    input_name = input("Masukkan nama file input (tanpa folder, cth: sample_input.json): ").strip()
+    input_name = input("\n> Masukkan nama file input (tanpa folder, cth: sample_input.json): ").strip()
     input_path = f"input/{input_name}"
 
     if not os.path.exists(input_path):
@@ -48,20 +49,24 @@ if __name__ == "__main__":
     # print(df)
 
     score = evaluate(state_awal, data)
+    print("╔══════════════════════════════════════════════════════╗")
+    print("║ [OBJECTIVE FUNCTION]  EVALUATED SCORE                ║")
+    print("╠══════════════════════════════════════════════════════╣")
+    print(f"║ Total Score : {score:.2f}                                 ║")
+    print("╚══════════════════════════════════════════════════════╝")
 
-    print("\n[OBJECTIVE FUNCTION] EVALUATED SCORE: ")
-    print("Score total:", score)
+    print("\n╔══════════════════════════════════════════════════════╗")
+    print("║                 ALGORITHM SELECTION                  ║")
+    print("╠══════════════════════════════════════════════════════╣")
+    print("║ 1. Hill Climbing                                     ║")
+    print("║ 2. Hill Climbing with Sideways Move                  ║")
+    print("║ 3. Hill Climbing with Random Restart                 ║")
+    print("║ 4. Stochastic Hill Climbing                          ║")
+    print("║ 5. Simulated Annealing                               ║")
+    print("║ 6. Genetic Algorithm                                 ║")
+    print("╚══════════════════════════════════════════════════════╝")
 
-    # ========================== SELECT ALGORITHM ==========================
-    print("\n[ALGORITHM] Pilihan Algoritma:")
-    print("1. Hill Climbing")
-    print("2. Hill Climbing with Sideways Move")
-    print("3. Hill Climbing with Random Restart")
-    print("4. Stochastic Hill Climbing")
-    print("5. Simulated Annealing")
-    print("6. Genetic Algorithm")
-
-    n = int(input("\nMasukkan pilihan algoritma: "))
+    n = int(input("\n> Masukkan pilihan algoritma: "))
 
     # ========================== EXECUTE ==========================
     if n == 1:
