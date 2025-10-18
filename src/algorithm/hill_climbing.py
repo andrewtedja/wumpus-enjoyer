@@ -175,27 +175,20 @@ def hill_climbing_stochastic(state, data, slots, max_iter=1000):
     print(f"[INIT] Score awal = {current_score}")
 
     for step in range(max_iter):
-        successor = getSuccessors(current, slots, data["kelas_mata_kuliah"])
-        if not successor:
+        successors = getSuccessors(current, slots, data["kelas_mata_kuliah"])
+        if not successors:
             print("[STOP] Tidak ada tetangga ditemukan.")
             break
 
-        # ambil tetangga yang lebih baik dari current
-        better_successor = [n for n in successor if evaluate(n, data) < current_score]
-
-        if not better_successor:
-            print("[STOP] Tidak ada neighbor yang lebih baik, berhenti.")
-            break
-
-        # pilih 1 random dari yang lebih baik
-        next_state = random.choice(better_successor)
+        # pilih 1 random
+        next_state = random.choice(successors)
         next_score = evaluate(next_state, data)
         print(f"[STEP {step+1}] {current_score} -> {next_score}")
+        scores.append(next_score)
 
 
         if next_score < current_score:
             current, current_score = next_state, next_score
-            scores.append(current_score)
             print(f"[UPDATE] Score diperbarui menjadi {current_score}")
         else:
             print("[NO UPDATE] Score tidak berubah.")

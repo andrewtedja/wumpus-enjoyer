@@ -204,12 +204,14 @@ if __name__ == "__main__":
     for kode, entries in jadwal_per_matkul.items():
         print(f"\n{kode} - {next((k['nama'] for k in data['kelas_mata_kuliah'] if k['kode'] == kode), 'Tidak diketahui')}")
         by_hari = {}
+        all_slots = []
         for hari, jam, ruang in entries:
             if hari not in by_hari:
                 by_hari[hari] = {}
             if ruang not in by_hari[hari]:
                 by_hari[hari][ruang] = []
             by_hari[hari][ruang].append(jam)
+            all_slots.append((hari, jam))
 
         for hari in urutan_hari:
             if hari not in by_hari:
@@ -217,3 +219,9 @@ if __name__ == "__main__":
             for ruang, jam_list in by_hari[hari].items():
                 for (mulai, selesai) in gabung_jam(jam_list):
                     print(f"  {hari}: {mulai:02d}.00 - {selesai:02d}.00 ({ruang})")
+        if all_slots:
+            all_slots.sort(key = lambda x: (urutan_hari.index(x[0]), x[1]))
+            paling_awal = all_slots[0]
+            paling_akhir = all_slots[-1]
+            print(f"Paling awal: {paling_awal[0]} jam {paling_awal[1]:02d}.00")
+            print(f"Paling akhir: {paling_akhir[0]} jam {paling_akhir[1]:02d}.00")
