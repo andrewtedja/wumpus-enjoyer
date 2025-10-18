@@ -14,6 +14,21 @@ import pandas as pd
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
+def gabung_jam(jam_list):
+    jam_list = sorted(jam_list)
+    hasil = []
+    start = jam_list[0]
+    prev = jam_list[0]
+    for j in jam_list[1:]:
+        if j == prev + 1:
+            prev = j
+        else:
+            hasil.append((start, prev + 1))
+            start = j
+            prev = j
+    hasil.append((start, prev + 1))
+    return hasil
+
 if __name__ == "__main__":
     clear_screen()
     print("╔══════════════════════════════════════════════════════╗")
@@ -175,3 +190,30 @@ if __name__ == "__main__":
     visualize_state(final_state, ruangan, save_path="output/jadwal-final.png", show=False)
 
     print(f"[DONE] Visualisasi jadwal awal dan akhir untuk algoritma {algo_name} selesai.")
+
+    print("\n[FINAL SCHEDULE]")
+    jadwal_per_matkul = {}
+
+    for (hari, jam, ruang), kode in sorted(final_state.items()):
+        if kode not in jadwal_per_matkul:
+            jadwal_per_matkul[kode] = []
+        jadwal_per_matkul[kode].append((hari, jam, ruang))
+
+    urutan_hari = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"]
+
+    for kode, entries in jadwal_per_matkul.items():
+        print(f"\n{kode} - {next((k['nama'] for k in data['kelas_mata_kuliah'] if k['kode'] == kode), 'Tidak diketahui')}")
+        by_hari = {}
+        for hari, jam, ruang in entries:
+            if hari not in by_hari:
+                by_hari[hari] = {}
+            if ruang not in by_hari[hari]:
+                by_hari[hari][ruang] = []
+            by_hari[hari][ruang].append(jam)
+
+        for hari in urutan_hari:
+            if hari not in by_hari:
+                continue
+            for ruang, jam_list in by_hari[hari].items():
+                for (mulai, selesai) in gabung_jam(jam_list):
+                    print(f"  {hari}: {mulai:02d}.00 - {selesai:02d}.00 ({ruang})")
